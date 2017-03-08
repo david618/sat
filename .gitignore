@@ -16,3 +16,4 @@ build/*
 nbproject/*
 mainifest.mf
 build.xml
+target/*
