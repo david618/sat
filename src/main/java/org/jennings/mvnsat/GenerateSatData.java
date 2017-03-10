@@ -20,11 +20,11 @@ public class GenerateSatData {
     public void run() {
         try {
 
-            FileWriter fw = new FileWriter("satellites2.dat");
+            FileWriter fw = new FileWriter("satellites.dat");
             
             HashMap<String, Sat> sats = new HashMap<>();
 
-            BufferedReader br = new BufferedReader(new FileReader("predict.tle"));
+            BufferedReader br = new BufferedReader(new FileReader("sats.tle"));
             String tleHeader = null;
             while ((tleHeader = br.readLine()) != null) {
                 String tleLine1 = br.readLine();
@@ -37,14 +37,18 @@ public class GenerateSatData {
             
             long t = System.currentTimeMillis();
             
-            for (int n=0; n<300; n++ ) {
+            for (int n=0; n<30; n++ ) {
                 for (String sat: sats.keySet()) {
                     //System.out.println(sat);
-                    Sat pos = sats.get(sat).getPos(t);
-                    String strLine = pos.getName() + "|" + pos.GetEpoch() + "|"
-                                + pos.GetLon() + "|" + pos.GetParametricLat()
-                                + "|" + pos.getAltitude();
-                    fw.write(strLine + "\n");
+                    try {
+                        Sat pos = sats.get(sat).getPos(t);
+                        String strLine = pos.getName() + "|" + pos.GetEpoch() + "|"
+                                    + pos.GetLon() + "|" + pos.GetParametricLat()
+                                    + "|" + pos.getAltitude();
+                        fw.write(strLine + "\n");
+                    } catch (Exception e) {
+                        //System.out.println("Error:" + sat + ":" + e.getMessage());
+                    }
                 }
                 t += 1000;
                 

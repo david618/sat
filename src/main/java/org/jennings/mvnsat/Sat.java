@@ -41,6 +41,7 @@ public class Sat {
     final double GM = G * M;
 
     private String name;
+    private String num;
     private DateTime epoch;
     private KeplerElements kep;
     private double Nu;
@@ -60,6 +61,14 @@ public class Sat {
     public void setName(String name) {
         this.name = name;
     }    
+
+    public String getNum() {
+        return num;
+    }
+
+    public void setNum(String num) {
+        this.num = num;
+    }
     
     /**
      * Calculate Keplerian elements given Cartesian
@@ -184,11 +193,12 @@ public class Sat {
         this.name = tleHeader.substring(0, 24).trim();
 
         // Line 1
+        this.num = tleLine1.substring(2,7);
         int epochYear = Integer.parseInt(tleLine1.substring(18, 20));
         double epochFday = Double.parseDouble(tleLine1.substring(20, 32));               
         this.epoch = new DateTime(2000 + epochYear, epochFday);
         
-        // Line 2
+        // Line 2        
         double incl = Double.parseDouble(tleLine2.substring(8, 16));
         double raan = Double.parseDouble(tleLine2.substring(17, 25));
         double ecc = Double.parseDouble("." + tleLine2.substring(26, 33));
@@ -218,8 +228,9 @@ public class Sat {
      * @param v
      * @param t 
      */
-    public Sat(String name, Vector p, Vector v, DateTime t) {
-        this.name = name.trim();
+    public Sat(String name, String num, Vector p, Vector v, DateTime t) {
+        this.name = name.trim();        
+        this.num = num;
         this.epoch = t;
         this.pos = p;
         this.vel = v;
@@ -235,8 +246,9 @@ public class Sat {
      * @param a
      * @param t 
      */
-    public Sat(String name, KeplerElements a, DateTime t) {
+    public Sat(String name, String num, KeplerElements a, DateTime t) {
         this.name = name.trim();
+        this.num = num;
         this.epoch = t;
         this.kep = new KeplerElements(a.getSma(), a.getIncl(), a.getEcc(), a.getLan(), a.getArg(), a.getXmo());
         this.mode = 'K';
@@ -362,7 +374,7 @@ public class Sat {
         NewEl.setXmo((kep.getXmo() + n * dt) % 360.0);
         NewEl.setLan((kep.getLan() - K1 * K2 * Math.cos(kep.getIncl() * DTOR) * dt) % 360.0);
         NewEl.setArg((kep.getArg() + K1 * K2 * (2 - 5.0 / 2.0 * Math.pow(Math.sin(kep.getIncl() * DTOR), 2)) * dt) % 360.0);
-        Sat NewEphm = new Sat(this.name, NewEl, epoch.plus(t));
+        Sat NewEphm = new Sat(this.name, this.num, NewEl, epoch.plus(t));
         return NewEphm;
     }
 
@@ -503,7 +515,7 @@ public class Sat {
 
             System.out.println("Epoch Time: " + ep);
 
-            Sat Sat = new Sat("ISS", tempKE, ep);
+            Sat Sat = new Sat("ISS", "1", tempKE, ep);
 
             long firstStep = now - ep.epochTimeSecs();
             System.out.println("Seconds from epoch: " + firstStep);

@@ -81,7 +81,7 @@ public class GenerateSatDataPredict {
         
         
         try {
-            FileReader fr = new FileReader("predict.tle");
+            FileReader fr = new FileReader("sats.tle");
             BufferedReader br = new BufferedReader(fr);
 
             ArrayList<String> satellites = new ArrayList<>();
