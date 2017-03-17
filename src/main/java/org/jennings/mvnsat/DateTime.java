@@ -46,8 +46,26 @@ public class DateTime {
         this.secV = 0.0;
     }
 
+    /**
+     * Set DateTime based on Epoch Milliseconds from 1 Jan 1970 00:00:00
+     * @param EpochMS 
+     */
+    DateTime(long EpochMS) {        
+        
+        // JD for 1970 2440587.5
+        // Convert Number Epoch Milliseconds to Number of days from Epoch
+        
+        this(2440587.5 + EpochMS/1000.0/86400.0);       
+    }
+    
     DateTime(double JD) {
 
+        // Julian Date starts at Noon Universal Time on 1 January, 4713BC
+        
+        // http://aa.usno.navy.mil/data/docs/JulianDate.php
+        
+        
+        
         // This roughly cooresponds to years 1900 to 2200
         /*
              * Might be OK outside this range, but I wouldn't bet on it.
@@ -107,14 +125,17 @@ public class DateTime {
         t = t - min;  // fraction min
         t = t * 60;  // seconds;
 
-        int sec = (int) Math.round(t);
+        //int sec = (int) Math.round(t);
+        
 
         this.yearV = year;
         this.monthV = month;
         this.dayV = date;
         this.hourV = hrs;
         this.minV = min;
-        this.secV = sec;
+        this.secV = t;
+        
+        date2jday();
 
     }
 
@@ -428,6 +449,27 @@ public class DateTime {
         return yrSec + jdaySec + hourSec + minSec + secSec;
     }
 
+    /** 
+     * Return DateTime n seconds from current time
+     * @param n
+     * @return 
+     */
+    public DateTime plus2(double n) {
+        
+        
+        long epochMS = this.epochTimeMillis();
+        
+        // Round to nearest millisecond
+        long nms = Math.round(n*1000.0);
+        
+        // Add the nms to epoch
+        long newEpochMS = epochMS + nms;
+        
+        return new DateTime(newEpochMS); 
+        
+    }
+    
+    
     public DateTime plus(double n) {
         long dm = (long) ((this.secV + n) / 60);
         double tempSec = ((this.secV + n) / 60.0 - dm) * 60;
@@ -471,11 +513,20 @@ public class DateTime {
     public static void main(String[] args) {
         try {
 
-            DateTime dt = new DateTime(1, 1, 2017, 1, 1, 1);
+            DateTime dt = new DateTime(17, 3, 2017, 3, 1, 1.23);
 
             System.out.println(dt);
-            System.out.println(dt.epochTimeMillis());
-            System.out.println(dt.epochTimeSecs());
+            for (int i = 0; i< 10; i++) {
+                DateTime d1 = dt.plus(60*i);
+                System.out.println(d1.yearV + ":" + d1.monthV + ":" + d1.dayV + " " + d1.hourV + ":" + d1.minV + ":" + d1.secV);
+                
+                DateTime d2 = dt.plus(60*i);
+                System.out.println(d2.yearV + ":" + d2.monthV + ":" + d2.dayV + " " + d2.hourV + ":" + d2.minV + ":" + d2.secV);
+                
+                
+                
+            }
+
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,6 +1,8 @@
 
 package org.jennings.mvnsat;
 
+import javax.sound.midi.SysexMessage;
+
 /*
 Tested agains ISS apps online.
 https://api.wheretheiss.at/v1/satellites/25544/tles
@@ -300,6 +302,16 @@ public class Sat {
         return alt;
     }
 
+    /**
+     * Returns the radius of the footprint
+     * Assumes spherical earth 
+     * @return 
+     */
+    public double getRadiusFootprint() {
+        // h + R is pos.mag()               
+        return this.RE * Math.acos(this.RE/pos.mag());        
+    }
+    
     public double GetLon() {
         double GST = epoch.GST();
         //System.out.println(GST);
@@ -344,9 +356,9 @@ public class Sat {
             t = timeMillis;
         }
         long numMillisecondsSinceEpoch = t - this.epoch.epochTimeMillis();
-        if (numMillisecondsSinceEpoch < 0) {
-            throw new Exception("Can't find points prior to Epoch");
-        }
+//        if (numMillisecondsSinceEpoch < 0) {
+//            throw new Exception("Can't find points prior to Epoch");
+//        }
         
         
 
@@ -361,8 +373,8 @@ public class Sat {
      */
     public Sat propagate(double t) {
 
-        //double SecPerDay = 86400.0;  // 24 hour day
-        double SecPerDay = 23.9344696 * 60.0 * 60.0;  // Sidereal Day
+        double SecPerDay = 86400.0;  // 24 hour day
+        //double SecPerDay = 23.9344696 * 60.0 * 60.0;  // Sidereal Day
 
         double dt = t / SecPerDay;
         double no = Math.sqrt(mu / Math.pow(kep.getSma(), 3)) * SecPerDay * RTOD;
@@ -373,8 +385,8 @@ public class Sat {
         NewEl.setEcc(kep.getEcc());
         NewEl.setXmo((kep.getXmo() + n * dt) % 360.0);
         NewEl.setLan((kep.getLan() - K1 * K2 * Math.cos(kep.getIncl() * DTOR) * dt) % 360.0);
-        NewEl.setArg((kep.getArg() + K1 * K2 * (2 - 5.0 / 2.0 * Math.pow(Math.sin(kep.getIncl() * DTOR), 2)) * dt) % 360.0);
-        Sat NewEphm = new Sat(this.name, this.num, NewEl, epoch.plus(t));
+        NewEl.setArg((kep.getArg() + K1 * K2 * (2 - 5.0 / 2.0 * Math.pow(Math.sin(kep.getIncl() * DTOR), 2)) * dt) % 360.0);        
+        Sat NewEphm = new Sat(this.name, this.num, NewEl, epoch.plus2(t));
         return NewEphm;
     }
 
@@ -517,20 +529,25 @@ public class Sat {
 
             Sat Sat = new Sat("ISS", "1", tempKE, ep);
 
+            long t = 86400*1000*10;  // How long ago to start from now
+            
             long firstStep = now - ep.epochTimeSecs();
             System.out.println("Seconds from epoch: " + firstStep);
-            Sat pos = Sat.getPos();
+            
+            Sat pos = Sat.getPos(System.currentTimeMillis() - t);
 
+            
             String strLine;
             try {
 
+                
                 while (true) {
                     strLine = pos.GetEpoch() + " "
                             + pos.GetLon() + " " + pos.GetParametricLat()
-                            + " " + pos.getAltitude() + "\n";
+                            + " " + pos.getAltitude() + " " + pos.getRadiusFootprint() + "\n";
                     System.out.print(strLine);
                     Thread.sleep(1000);
-                    pos = Sat.getPos();
+                    pos = Sat.getPos(System.currentTimeMillis() - t);
                     //fw.write(strLine);
                 }
 
