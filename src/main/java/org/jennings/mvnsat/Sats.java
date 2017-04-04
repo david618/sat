@@ -12,8 +12,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
+<<<<<<< HEAD
 import org.json.JSONArray;
 import org.json.JSONObject;
+=======
+
+>>>>>>> dbd6b80f213266b12630e236e53726eab645a01f
 
 /**
  *
@@ -37,7 +41,11 @@ public class Sats {
             //BufferedReader br = new BufferedReader(new InputStreamReader(pis, "UTF-8"));
             FileReader fr = new FileReader("sats.tle");
             BufferedReader br = new BufferedReader(fr);
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> dbd6b80f213266b12630e236e53726eab645a01f
             String tleHeader;
             while ((tleHeader = br.readLine()) != null) {
                 String tleLine1 = br.readLine();
@@ -184,6 +192,7 @@ public class Sats {
 
     }
 
+<<<<<<< HEAD
     private void createSimulationFile(int duration, int step, String fmt) {
         try {
             
@@ -197,6 +206,11 @@ public class Sats {
             }
             
             
+=======
+    private void createSimulationFile(int duration, int step) {
+        try {
+            FileWriter fw = new FileWriter("satellites.txt");
+>>>>>>> dbd6b80f213266b12630e236e53726eab645a01f
 
             long st = System.currentTimeMillis();
 
@@ -204,6 +218,7 @@ public class Sats {
             int stepSecs = step;
             HashSet<String> sats = new HashSet<>();
             sats = getAllNums();
+<<<<<<< HEAD
 
             String strDel = ",";
 
@@ -261,6 +276,24 @@ public class Sats {
                 fw.write(featureCollection.toString());
             }
 
+=======
+            
+            String strDel = ",";
+
+            long t = st;
+            while (t < (st + durationSecs * 1000)) {
+                System.out.println(t);
+                t += stepSecs * 1000;
+                for (String sat : sats) {
+                    Sat pos = getSatNum(sat).getPos(t);
+                    String line = pos.getName() + strDel + pos.getNum() + strDel + pos.GetEpoch().epochTimeMillis()
+                            + strDel + pos.GetEpoch() + strDel + pos.GetLon() + strDel + pos.GetParametricLat()
+                            + strDel + pos.getAltitude() + "\n";
+                    fw.write(line);
+                }
+            }
+
+>>>>>>> dbd6b80f213266b12630e236e53726eab645a01f
             fw.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -269,6 +302,7 @@ public class Sats {
 
     public static void main(String[] args) {
         Sats t = new Sats();
+<<<<<<< HEAD
         
         t.createSimulationFile(1000, 1, "geojson");
 
@@ -280,6 +314,18 @@ public class Sats {
 //            t.createSimulationFile(Integer.parseInt(args[0]), Integer.parseInt(args[1]), args[2]);
 //        }
 
+=======
+
+        if (args.length != 2) {
+            System.err.print("Usage: Sats <durationSecs> <stepSecs>\n");
+        } else {
+            
+            
+                t.createSimulationFile(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+
+        }
+                
+>>>>>>> dbd6b80f213266b12630e236e53726eab645a01f
     }
 
 }
