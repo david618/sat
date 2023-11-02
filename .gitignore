@@ -18,3 +18,5 @@ nbproject/*
 mainifest.mf
 build.xml
 target/*
+.idea
+.vscode
